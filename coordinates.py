@@ -15,8 +15,9 @@ def convert_value(value):
         return -int(value[:-1]) / 100.
 
 
-def get_ports():
+def get_ports_coordinates():
     dfg = pd.read_csv("Downloads/code-list_csv.csv")
+    #dfg = pd.read_csv("code-list_csv.csv")
     dfg = dfg.dropna(subset=["Coordinates"])
 
     df = pd.DataFrame()
@@ -32,9 +33,10 @@ def get_ports():
 
     return dfg
 
-def plot_ports():
+def plot_ports(list_of_ports):
     world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
-    dfg = get_ports().sample(1000)
+    dfg = get_ports()
+    dfg = dfg[dfg['UNLocode'].isin(list_of_ports)]
     ax = dfg.plot(color='k', marker='o', zorder=2)
     world.plot(ax=ax, zorder=1)
     plt.show()
