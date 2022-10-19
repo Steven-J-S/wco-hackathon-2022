@@ -22,6 +22,7 @@ def get_ports_coordinates():
 
     df = pd.DataFrame()
     df["UNLocode"] = dfg["Country"] + dfg["Location"]
+    df["Name"] = dfg["Name"].str.capitalize()
 
     dfk = pd.DataFrame(
         dfg["Coordinates"].dropna().str.split(" ").to_list(), columns=["lon", "lan"]
@@ -34,16 +35,20 @@ def get_ports_coordinates():
     return dfg
 
 
-def plot_ports(list_of_ports):
+def plot_ports(list_of_ports, unloc=True):
     world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
     dfg = get_ports()
-    dfg = dfg[dfg["UNLocode"].isin(list_of_ports)]
+    if unloc:
+        dfg = dfg[dfg["UNLocode"].isin(list_of_ports)]
+    else:
+        dfg = dfg[dfg["Name"].isin(list_of_ports)]
     ax = dfg.plot(color="k", marker="o", zorder=2)
     world.plot(ax=ax, zorder=1)
     plt.show()
 
 
 def ports_to_x_dx(list_of_ports):
+    """ports_to_x_dx(["NLRTM", "CNXMG", "CNNBG"]) -> [(10, 11, 2, 2), (12, 13, 1, 1), ...]"""
     dfg = get_ports_coordinates()
     dfg = dfg[dfg["UNLocode"].isin(list_of_ports)]
 
@@ -59,4 +64,5 @@ def ports_to_x_dx(list_of_ports):
     return list_
 
 
-a = ports_to_x_dx(["NLRTM", "CNXMG", "CNNBG"])
+#a = ports_to_x_dx(["NLRTM", "CNXMG", "CNNBG"])
+dfg = pd.read_csv("data/code-list_csv.csv")
