@@ -33,10 +33,10 @@ def get_ports_coordinates():
 
     return dfg
 
-    
+
 def get_ports(list_of_ports, unloc=True):
-    """if unloc ["NLRTM", "CNXMG", "CNNBG"] 
-                ["ROTTERDAM, SHANGHAI, LONDON"] """
+    """if unloc ["NLRTM", "CNXMG", "CNNBG"]
+    ["ROTTERDAM, SHANGHAI, LONDON"]"""
     dfg = get_ports_coordinates()
     if unloc:
         dfg = dfg[dfg["UNLocode"].isin(list_of_ports)]
@@ -44,12 +44,14 @@ def get_ports(list_of_ports, unloc=True):
         dfg = dfg[dfg["Name"].isin(list_of_ports)]
     return dfg
 
+
 def plot_ports(list_of_ports, unloc=True):
     dfg = get_ports(list_of_ports, unloc=unloc)
     world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
-    ax = dfg.plot(color="k", marker="o", zorder=2)
+    fig, ax = plt.subplots()
+    dfg.plot(ax=ax, color="k", marker="o", zorder=2)
     world.plot(ax=ax, zorder=1)
-    plt.show()
+    return fig, ax
 
 
 def ports_to_x_dx(list_of_ports, unloc=True):
