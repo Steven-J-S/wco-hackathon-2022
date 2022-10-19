@@ -16,7 +16,6 @@ def convert_value(value):
 
 
 def get_ports_coordinates():
-    # dfg = pd.read_csv("Downloads/code-list_csv.csv")
     dfg = pd.read_csv("data/code-list_csv.csv")
     dfg = dfg.dropna(subset=["Coordinates"])
 
@@ -34,23 +33,28 @@ def get_ports_coordinates():
 
     return dfg
 
-
-def plot_ports(list_of_ports, unloc=True):
-    world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
-    dfg = get_ports()
+    
+def get_ports(list_of_ports, unloc=True):
+    """if unloc ["NLRTM", "CNXMG", "CNNBG"] 
+                ["ROTTERDAM, SHANGHAI, LONDON"] """
+    dfg = get_ports_coordinates()
     if unloc:
         dfg = dfg[dfg["UNLocode"].isin(list_of_ports)]
     else:
         dfg = dfg[dfg["Name"].isin(list_of_ports)]
+    return dfg
+
+def plot_ports(list_of_ports, unloc=True):
+    dfg = get_ports(list_of_ports, unloc=unloc)
+    world = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
     ax = dfg.plot(color="k", marker="o", zorder=2)
     world.plot(ax=ax, zorder=1)
     plt.show()
 
 
-def ports_to_x_dx(list_of_ports):
+def ports_to_x_dx(list_of_ports, unloc=True):
     """ports_to_x_dx(["NLRTM", "CNXMG", "CNNBG"]) -> [(10, 11, 2, 2), (12, 13, 1, 1), ...]"""
-    dfg = get_ports_coordinates()
-    dfg = dfg[dfg["UNLocode"].isin(list_of_ports)]
+    dfg = get_ports(list_of_ports, unloc=unloc)
 
     list_ = []
     for i, port_origin in enumerate(list_of_ports[:-1]):
@@ -60,9 +64,6 @@ def ports_to_x_dx(list_of_ports):
         port_dest = list_of_ports[i + 1]
         port_dest_xy = dfg.query("UNLocode == @port_dest").iloc[0].geometry
         dx, dy = port_dest_xy.x - x, port_dest_xy.y - y
+
         list_.append((x, y, dx, dy))
     return list_
-
-
-#a = ports_to_x_dx(["NLRTM", "CNXMG", "CNNBG"])
-dfg = pd.read_csv("data/code-list_csv.csv")
