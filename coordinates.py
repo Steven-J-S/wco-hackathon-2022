@@ -16,8 +16,8 @@ def convert_value(value):
 
 
 def get_ports_coordinates():
-    dfg = pd.read_csv("Downloads/code-list_csv.csv")
-    #dfg = pd.read_csv("code-list_csv.csv")
+    #dfg = pd.read_csv("Downloads/code-list_csv.csv")
+    dfg = pd.read_csv("data/code-list_csv.csv")
     dfg = dfg.dropna(subset=["Coordinates"])
 
     df = pd.DataFrame()
@@ -40,3 +40,20 @@ def plot_ports(list_of_ports):
     ax = dfg.plot(color='k', marker='o', zorder=2)
     world.plot(ax=ax, zorder=1)
     plt.show()
+
+def ports_to_x_dx(list_of_ports):
+    dfg = get_ports_coordinates()
+    dfg = dfg[dfg['UNLocode'].isin(list_of_ports)]
+   
+    list_ = []
+    for i, port_origin in enumerate(list_of_ports[:-1]):
+        port_origin_xy = dfg.query("UNLocode == @port_origin").iloc[0].geometry
+        x, y = port_origin_xy.x, port_origin_xy.y 
+        
+        port_dest = list_of_ports[i + 1]
+        port_dest_xy = dfg.query("UNLocode == @port_dest").iloc[0].geometry
+        dx, dy = port_dest_xy.x - x, port_dest_xy.y - y
+        list_.append((x, y, dx, dy))
+    return list_
+
+a = ports_to_x_dx(["NLRTM", "CNXMG", "CNNBG"])
